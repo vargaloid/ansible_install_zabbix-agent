@@ -1,16 +1,11 @@
 #########################################################
 # Varg                                                  #
 # Install zabbix-agent-3.2. Only for CentOS7 & Debian 8 #
-# Version 0.02                                          #
+# Version 0.04                                          #
 ######################################################### 
 ---
-- hosts: test
-  tasks:
-  - name: ping hosts
-    ping:
-
-  - name: check OS
-    debug: msg="{{ansible_distribution}}"
-
-#  - name: add zabbix repository for zabbix-agent 3.2
- 
+- hosts: "{{ hosts }}"
+  become: yes
+#  remote_user: USERNAME
+  roles:
+    - zabbix.agent

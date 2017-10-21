@@ -1,0 +1,108 @@
+---
+##### Install zabbix-agent
+  - name: ping hosts
+    ping:
+
+  - name: check OS
+    debug: msg={{ansible_distribution}}-{{ansible_distribution_version}}
+
+  - name: disable SELinux
+    selinux:
+     state: disabled
+    when: ansible_os_family == "RedHat"
+    become: yes
+
+  - name: install zabbix centOS 7 rpm file
+    yum: name=http://repo.zabbix.com/zabbix/3.2/rhel/7/x86_64/zabbix-release-3.2-1.el7.noarch.rpm
+    when: ansible_os_family == "RedHat"
+    become: yes
+
+  - name: install zabbix-agent 3.2 for centOS 7
+    yum: name=zabbix-agent
+    when: ansible_os_family == "RedHat"
+    become: yes
+
+  - name: download zabbix deb file for Debian 8
+    get_url:
+      url: http://repo.zabbix.com/zabbix/3.2/debian/pool/main/z/zabbix-release/zabbix-release_3.2-1+jessie_all.deb
+      dest: /tmp/zabbix-release_3.2-1+jessie_all.deb
+    when: ansible_distribution_release == 'jessie'
+
+  - name: install zabbix deb in Debian 8
+    apt: deb="/tmp/zabbix-release_3.2-1+jessie_all.deb"
+    when: ansible_distribution_release == 'jessie'
+    become: yes
+
+  - name: install zabbix-agent 3.2 Debian 8
+    apt:
+      name: zabbix-agent
+      update_cache: yes
+    when: ansible_distribution_release == 'jessie'
+    become: yes
+
+##### enabled zabbix-agent
+  - name: enable service zabbix-agent and ensure it is not masked
+    systemd:
+      name: zabbix-agent
+      enabled: yes
+      masked: no
+    become: yes
+
+##### check zabbix home dir and shell
+  - name: Make sure a service is stopped
+    systemd: state=stopped name=zabbix-agent
+    become: yes
+
+  - name: check zabbix home dir and shell
+    user:
+      name: zabbix
+      shell: /bin/bash
+      home: /etc/zabbix
+    become: yes
+
+##### mkdir /etc/zabbix/scripts and rights
+  - name: mkdir /etc/zabbix/scripts and rights
+    file:
+      path: /etc/zabbix/scripts
+      state: directory
+      owner: zabbix
+      group: zabbix
+      mode: 0700
+    become: yes
+
+##### change zabbix_agentd.conf
+  - name: change zabbix_agentd.conf Hostname
+    lineinfile:
+      path: /etc/zabbix/zabbix_agentd.conf
+      state: present
+      regexp: 'Hostname=Zabbix server'
+      line: "Hostname={{ ansible_hostname }}"
+    become: yes
+    
+  - name: change zabbix_agentd.conf ServerActive
+    lineinfile:
+      path: /etc/zabbix/zabbix_agentd.conf
+      state: present
+      regexp: 'ServerActive=127.0.0.1'
+      line: 'ServerActive=XXX.XXX.XXX.XXX'
+    become: yes
+
+  - name: change zabbix_agentd.conf Server
+    lineinfile:
+      path: /etc/zabbix/zabbix_agentd.conf
+      state: present
+      regexp: 'Server=127.0.0.1'
+      line: 'Server=XXX.XXX.XXX.XXX'
+    become: yes
+
+  - name: change zabbix_agentd.conf EnableRemoteCommands
+    lineinfile:
+      path: /etc/zabbix/zabbix_agentd.conf
+      state: present
+      regexp: '# EnableRemoteCommands=0'
+      line: 'EnableRemoteCommands=1'
+    become: yes
+
+  - name: Make sure a service is started
+    systemd: state=started name=zabbix-agent
+    become: yes
