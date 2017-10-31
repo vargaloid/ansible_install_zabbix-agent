@@ -6,6 +6,7 @@
   - name: check OS
     debug: msg={{ansible_distribution}}-{{ansible_distribution_version}}
 
+### centOS 7
   - name: disable SELinux
     selinux:
      state: disabled
@@ -22,6 +23,7 @@
     when: ansible_os_family == "RedHat"
     become: yes
 
+### Debian 8
   - name: download zabbix deb file for Debian 8
     get_url:
       url: http://repo.zabbix.com/zabbix/3.2/debian/pool/main/z/zabbix-release/zabbix-release_3.2-1+jessie_all.deb
@@ -38,6 +40,26 @@
       name: zabbix-agent
       update_cache: yes
     when: ansible_distribution_release == 'jessie'
+    become: yes
+
+### Debian 9
+  - name: download zabbix deb file for Debian 9
+    get_url:
+      url: http://repo.zabbix.com/zabbix/3.2/debian/pool/main/z/zabbix-release/zabbix-release_3.2-1+stretch_all.deb
+      dest: /tmp/zabbix-release_3.2-1+stretch_all.deb
+    when: ansible_distribution_release == 'stretch'
+    become: yes
+
+  - name: install zabbix deb in Debian 9
+    apt: deb="/tmp/zabbix-release_3.2-1+stretch_all.deb"
+    when: ansible_distribution_release == 'stretch'
+    become: yes
+
+  - name: install zabbix-agent 3.2 Debian 9
+    apt:
+      name: zabbix-agent
+      update_cache: yes
+    when: ansible_distribution_release == 'stretch'
     become: yes
 
 ##### enabled zabbix-agent
