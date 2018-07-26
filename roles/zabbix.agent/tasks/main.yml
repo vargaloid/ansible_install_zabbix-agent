@@ -14,11 +14,11 @@
     become: yes
 
   - name: install zabbix centOS 7 rpm file
-    yum: name=http://repo.zabbix.com/zabbix/3.2/rhel/7/x86_64/zabbix-release-3.2-1.el7.noarch.rpm
+    yum: name=https://repo.zabbix.com/zabbix/3.4/rhel/7/x86_64/zabbix-release-3.4-1.el7.centos.noarch.rpm
     when: ansible_os_family == "RedHat"
     become: yes
 
-  - name: install zabbix-agent 3.2 for centOS 7
+  - name: install zabbix-agent 3.4 for centOS 7
     yum: name=zabbix-agent
     when: ansible_os_family == "RedHat"
     become: yes
@@ -26,16 +26,16 @@
 ### Debian 8
   - name: download zabbix deb file for Debian 8
     get_url:
-      url: http://repo.zabbix.com/zabbix/3.2/debian/pool/main/z/zabbix-release/zabbix-release_3.2-1+jessie_all.deb
-      dest: /tmp/zabbix-release_3.2-1+jessie_all.deb
+      url: https://repo.zabbix.com/zabbix/3.4/debian/pool/main/z/zabbix-release/zabbix-release_3.4-1+jessie_all.deb
+      dest: /tmp/zabbix-release_3.4-1+jessie_all.deb
     when: ansible_distribution_release == 'jessie'
 
   - name: install zabbix deb in Debian 8
-    apt: deb="/tmp/zabbix-release_3.2-1+jessie_all.deb"
+    apt: deb="/tmp/zabbix-release_3.4-1+jessie_all.deb"
     when: ansible_distribution_release == 'jessie'
     become: yes
 
-  - name: install zabbix-agent 3.2 Debian 8
+  - name: install zabbix-agent 3.4 Debian 8
     apt:
       name: zabbix-agent
       update_cache: yes
@@ -45,17 +45,17 @@
 ### Debian 9
   - name: download zabbix deb file for Debian 9
     get_url:
-      url: http://repo.zabbix.com/zabbix/3.2/debian/pool/main/z/zabbix-release/zabbix-release_3.2-1+stretch_all.deb
-      dest: /tmp/zabbix-release_3.2-1+stretch_all.deb
+      url: https://repo.zabbix.com/zabbix/3.4/debian/pool/main/z/zabbix-release/zabbix-release_3.4-1+stretch_all.deb
+      dest: /tmp/zabbix-release_3.4-1+stretch_all.deb
     when: ansible_distribution_release == 'stretch'
     become: yes
 
   - name: install zabbix deb in Debian 9
-    apt: deb="/tmp/zabbix-release_3.2-1+stretch_all.deb"
+    apt: deb="/tmp/zabbix-release_3.4-1+stretch_all.deb"
     when: ansible_distribution_release == 'stretch'
     become: yes
 
-  - name: install zabbix-agent 3.2 Debian 9
+  - name: install zabbix-agent 3.4 Debian 9
     apt:
       name: zabbix-agent
       update_cache: yes
@@ -125,6 +125,40 @@
       line: 'EnableRemoteCommands=1'
     become: yes
 
+  - name: change zabbix_agentd.conf LogRemoteCommands
+    lineinfile:
+      path: /etc/zabbix/zabbix_agentd.conf
+      state: present
+      regexp: '# LogRemoteCommands=0'
+      line: 'LogRemoteCommands=1'
+### Install Vulners plugin
+### CentOS7
+  - name: install plugin repo centOS 7 rpm file
+    yum: name=https://repo.vulners.com/redhat/vulners-repo.rpm
+    when: ansible_os_family == "RedHat"
+
+  - name: install plugin for centOS 7
+    yum: name=zabbix-threat-control-host
+    when: ansible_os_family == "RedHat"
+
+### Debian
+  - name: download plugin deb file for Debian
+    get_url:
+      url: https://repo.vulners.com/debian/vulners-repo.deb
+      dest: /tmp/vulners-repo.deb
+    when: ansible_os_family == "Debian"
+
+  - name: install plugin deb in Debian
+    apt: deb="/tmp/vulners-repo.deb"
+    when: ansible_os_family == "Debian"
+
+  - name: install plugin Debian
+    apt:
+      name: zabbix-threat-control-host
+      update_cache: yes
+    when: ansible_os_family == "Debian"
+
+### Starting zabbix-agent
   - name: Make sure a service is started
     systemd: state=started name=zabbix-agent
     become: yes
