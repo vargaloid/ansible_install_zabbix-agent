@@ -11,56 +11,108 @@
     selinux:
      state: disabled
     when: ansible_os_family == "RedHat"
-    become: yes
 
   - name: install zabbix centOS 7 rpm file
     yum: name=https://repo.zabbix.com/zabbix/3.4/rhel/7/x86_64/zabbix-release-3.4-1.el7.centos.noarch.rpm
     when: ansible_os_family == "RedHat"
-    become: yes
 
   - name: install zabbix-agent 3.4 for centOS 7
-    yum: name=zabbix-agent
+    yum: 
+      name: zabbix-agent
+      enablerepo: zabbix
+      state: latest
     when: ansible_os_family == "RedHat"
-    become: yes
 
 ### Debian 8
   - name: download zabbix deb file for Debian 8
     get_url:
-      url: https://repo.zabbix.com/zabbix/3.4/debian/pool/main/z/zabbix-release/zabbix-release_3.4-1+jessie_all.deb
-      dest: /tmp/zabbix-release_3.4-1+jessie_all.deb
+      url: https://repo.zabbix.com/zabbix/4.0/debian/pool/main/z/zabbix-release/zabbix-release_4.0-2+jessie_all.deb 
+      dest: /tmp/zabbix-release_4.0-2+jessie_all.deb
     when: ansible_distribution_release == 'jessie'
 
   - name: install zabbix deb in Debian 8
-    apt: deb="/tmp/zabbix-release_3.4-1+jessie_all.deb"
+    apt: deb="/tmp/zabbix-release_4.0-2+jessie_all.deb"
     when: ansible_distribution_release == 'jessie'
-    become: yes
 
-  - name: install zabbix-agent 3.4 Debian 8
+  - name: install zabbix-agent 4.0 Debian 8
     apt:
       name: zabbix-agent
+      state: latest
       update_cache: yes
     when: ansible_distribution_release == 'jessie'
-    become: yes
 
 ### Debian 9
   - name: download zabbix deb file for Debian 9
     get_url:
-      url: https://repo.zabbix.com/zabbix/3.4/debian/pool/main/z/zabbix-release/zabbix-release_3.4-1+stretch_all.deb
-      dest: /tmp/zabbix-release_3.4-1+stretch_all.deb
+      url: https://repo.zabbix.com/zabbix/4.0/debian/pool/main/z/zabbix-release/zabbix-release_4.0-2+stretch_all.deb 
+      dest: /tmp/zabbix-release_4.0-2+stretch_all.deb
     when: ansible_distribution_release == 'stretch'
-    become: yes
 
   - name: install zabbix deb in Debian 9
-    apt: deb="/tmp/zabbix-release_3.4-1+stretch_all.deb"
+    apt: deb="/tmp/zabbix-release_4.0-2+stretch_all.deb"
     when: ansible_distribution_release == 'stretch'
-    become: yes
 
-  - name: install zabbix-agent 3.4 Debian 9
+  - name: install zabbix-agent 4.0 Debian 9
     apt:
       name: zabbix-agent
+      state: latest
       update_cache: yes
     when: ansible_distribution_release == 'stretch'
-    become: yes
+
+### Debian 10
+  - name: download zabbix deb file for Debian 10
+    get_url:
+      url: https://repo.zabbix.com/zabbix/4.0/debian/pool/main/z/zabbix-release/zabbix-release_4.0-2+buster_all.deb 
+      dest: /tmp/zabbix-release_4.0-2+buster_all.deb
+    when: ansible_distribution_release == 'buster'
+
+  - name: install zabbix deb in Debian 10
+    apt: deb="/tmp/zabbix-release_4.0-2+buster_all.deb"
+    when: ansible_distribution_release == 'buster'
+
+  - name: install zabbix-agent 4.0 Debian 10
+    apt:
+      name: zabbix-agent
+      state: latest
+      update_cache: yes
+    when: ansible_distribution_release == 'buster'
+
+### Ubuntu 16.04 Xenial
+  - name: download zabbix deb file fot Ubuntu 16.04
+    get_url:
+      url: https://repo.zabbix.com/zabbix/4.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_4.0-2+xenial_all.deb
+      dest: /tmp/zabbix-release_4.0-2+xenial_all.deb
+    when: ansible_distribution_release == 'xenial'
+
+  - name: install zabbix deb for Ubuntu 16.04 Xenial
+    apt: deb="/tmp/zabbix-release_4.0-2+xenial_all.deb"
+    when: ansible_distribution_release == 'xenial'
+
+  - name: install zabbix-agent 4.0 Ubuntu 16.04
+    apt:
+      name: zabbix-agent
+      state: latest
+      update_cache: yes
+    when: ansible_distribution_release == 'xenial'
+
+
+### Ubuntu 18.04 Bionic Beaver
+  - name: download zabbix deb file fot Ubuntu 18.04
+    get_url:
+      url: https://repo.zabbix.com/zabbix/4.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_4.0-2+bionic_all.deb
+      dest: /tmp/zabbix-release_4.0-2+bionic_all.deb
+    when: ansible_distribution_release == 'bionic'
+
+  - name: install zabbix deb for Ubuntu 18.04 Xenial
+    apt: deb="/tmp/zabbix-release_4.0-2+bionic_all.deb"
+    when: ansible_distribution_release == 'bionic'
+
+  - name: install zabbix-agent 4.0 Ubuntu 18.04
+    apt:
+      name: zabbix-agent
+      state: latest
+      update_cache: yes
+    when: ansible_distribution_release == 'bionic'
 
 ##### enabled zabbix-agent
   - name: enable service zabbix-agent and ensure it is not masked
@@ -131,7 +183,8 @@
       state: present
       regexp: '# LogRemoteCommands=0'
       line: 'LogRemoteCommands=1'
-### Install Vulners plugin
+
+##### Install Vulners plugin
 ### CentOS7
   - name: install plugin repo centOS 7 rpm file
     yum: name=https://repo.vulners.com/redhat/vulners-repo.rpm
