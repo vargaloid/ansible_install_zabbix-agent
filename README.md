@@ -1,15 +1,17 @@
 # ansible-playbook.zabbix-agent
 ansible-playbook. Add and configure zabbix-agent.
 
-Zabbix-agent 4.0 for CentOS 7; Debian 8 (jessie); Debian 9 (stretch); Debian 10 (buster), Ubuntu 16.04 (xenial), Ubuntu 18.04 (Bionic Beaver)
+Zabbix-agent 4.4 for CentOS 7; Debian 8 (jessie); Debian 9 (stretch); Debian 10 (buster), Ubuntu 16.04 (xenial), Ubuntu 18.04 (Bionic Beaver)
 
 Only for fresh installation!
 
-You have modify 2 files:
-1) zabbix-agent.yml --- "remote_user" and "hosts"
-2) roles/zabbix.agent/tasks/main.yml --- "line: 'ServerActive=XXX.XXX.XXX.XXX'" and "line: 'Server=XXX.XXX.XXX.XXX'" with your server ip-address
+You have to modify:
+* zabbix-agent.yml --- "remote_user", "hosts", "zbx_srv"
 
 Run: ansible-playbook zabbix-agent.yml --ask-sudo-pass
+
+Version 0.07
+ - version of zabbix-agent changed to 4.4
 
 Version 0.06
  - version of zabbix-agent changed to 4.0
