@@ -1,0 +1,15 @@
+---
+- name: Install Python mysqlclient
+  ansible.builtin.apt:
+    name: python3-mysqldb
+    state: present
+  when: ansible_facts.services['mysql.service'] is defined
+
+- name: Create MySQL user for zabbix-agent2
+  community.mysql.mysql_user:
+    name: "{{ mysql_user_for_zbx_agent }}"
+    password: "{{ mysql_pass_for_zbx_agent }}"
+    host: 'localhost'
+    priv: '*.*:SLAVE MONITOR,REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW'
+    state: present
+  when: ansible_facts.services['mysql.service'] is defined
