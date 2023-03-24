@@ -1,0 +1,10 @@
+---
+- hosts: "{{ hosts }}"
+  become: yes
+#  remote_user: USERNAME
+  vars:
+    zbx_srv_ip: 192.168.0.2
+    mysql_user_for_zbx_agent: zabbixagent
+    mysql_pass_for_zbx_agent: ''
+  roles:
+    - zabbix-agent2
