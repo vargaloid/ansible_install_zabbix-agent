@@ -67,6 +67,10 @@
   include_tasks:
     file: mysql_plugin.yaml
 
+- name: Check and configure RAID MD Soft
+  include_tasks:
+    file: soft_raid_template.yaml
+
 - name: Stop and disable zabbix-agent1
   ansible.builtin.systemd:
     name: zabbix-agent
