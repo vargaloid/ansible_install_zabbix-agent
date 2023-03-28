@@ -75,6 +75,10 @@
   include_tasks:
     file: nginx_template.yaml
 
+- name: Check and configure SMART template
+  include_tasks:
+    file: smart_template.yaml
+
 - name: Stop and disable zabbix-agent1
   ansible.builtin.systemd:
     name: zabbix-agent
