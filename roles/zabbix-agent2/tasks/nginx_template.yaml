@@ -1,0 +1,29 @@
+---
+- block:
+    - name: Backup default vhost
+      ansible.builtin.copy:
+        remote_src: true
+        src: /etc/nginx/sites-available/default
+        dest: /etc/nginx/sites-available/default.ansible_backup
+
+    - name: Copy new default vhost
+      ansible.builtin.template:
+        src: default.j2
+        dest: /etc/nginx/sites-available/default
+        mode: 0644
+
+    - name: Check nginx configs
+      ansible.builtin.shell: "/usr/sbin/nginx -t"
+      register: nginx_config_status
+
+    - name: Debug nginx status
+      ansible.builtin.debug:
+        msg: "{{ nginx_config_status.rc }}"
+
+    - name: Service nginx reload
+      ansible.builtin.systemd:
+        name: nginx
+        state: reloaded
+      when: nginx_config_status.rc == 0
+
+  when: ansible_facts.services['nginx.service'] is defined

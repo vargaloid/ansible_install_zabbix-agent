@@ -63,13 +63,17 @@
 - name: Populate service facts
   ansible.builtin.service_facts:
 
-- name: Setup mysql plugin
+- name: Check and setup mysql plugin
   include_tasks:
     file: mysql_plugin.yaml
 
 - name: Check and configure RAID MD Soft
   include_tasks:
     file: soft_raid_template.yaml
+
+- name: Check and configure nginx template
+  include_tasks:
+    file: nginx_template.yaml
 
 - name: Stop and disable zabbix-agent1
   ansible.builtin.systemd:
