@@ -12,5 +12,6 @@
         host: 'localhost'
         priv: '*.*:SLAVE MONITOR,REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW'
         state: present
+      notify: Restart and enable zabbix-agent2
 
   when: ansible_facts.services['mysql.service'] is defined

@@ -64,22 +64,18 @@
 - name: Check and setup mysql plugin
   include_tasks:
     file: mysql_plugin.yaml
-  notify: Restart and enable zabbix-agent2
 
 - name: Check and configure RAID MD Soft
   include_tasks:
     file: soft_raid_template.yaml
-  notify: Restart and enable zabbix-agent2
 
 - name: Check and configure nginx template
   include_tasks:
     file: nginx_template.yaml
-  notify: Restart and enable zabbix-agent2
 
 - name: Check and configure SMART template
   include_tasks:
     file: smart_template.yaml
-  notify: Restart and enable zabbix-agent2
 
 - name: Stop and disable zabbix-agent1
   ansible.builtin.systemd:

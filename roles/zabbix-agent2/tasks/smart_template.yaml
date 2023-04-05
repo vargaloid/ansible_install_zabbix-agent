@@ -15,5 +15,6 @@
         user: zabbix
         nopassword: true
         commands: /usr/sbin/smartctl
+      notify: Restart and enable zabbix-agent2
 
   when: ansible_virtualization_role == 'host'

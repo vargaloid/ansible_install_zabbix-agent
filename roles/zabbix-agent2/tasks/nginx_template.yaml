@@ -27,3 +27,4 @@
       when: nginx_config_status.rc == 0
 
   when: ansible_facts.services['nginx.service'] is defined
+  notify: Restart and enable zabbix-agent2
