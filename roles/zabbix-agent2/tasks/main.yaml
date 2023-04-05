@@ -19,11 +19,6 @@
     update_cache: yes
   when: ansible_os_family == "Debian"
 
-- name: Make sure zabbix-agent2 is stopped
-  ansible.builtin.systemd:
-    state: stopped
-    name: zabbix-agent2
-
 - name: Check zabbix user, home dir and shell
   ansible.builtin.user:
     name: zabbix
@@ -45,6 +40,7 @@
     regexp: '^Hostname=*'
     line: "Hostname={{ ansible_hostname }}"
     state: present
+  notify: Restart and enable zabbix-agent2
 
 - name: Change zabbix_agent2.conf ServerActive
   ansible.builtin.lineinfile:
@@ -52,6 +48,7 @@
     regexp: '^ServerActive='
     line: "ServerActive={{ zbx_srv_ip }}"
     state: present
+  notify: Restart and enable zabbix-agent2
 
 - name: Change zabbix_agent2.conf Server
   ansible.builtin.lineinfile:
@@ -59,6 +56,7 @@
     regexp: '^Server='
     line: "Server={{ zbx_srv_ip }}"
     state: present
+  notify: Restart and enable zabbix-agent2
 
 - name: Populate service facts
   ansible.builtin.service_facts:
@@ -66,18 +64,22 @@
 - name: Check and setup mysql plugin
   include_tasks:
     file: mysql_plugin.yaml
+  notify: Restart and enable zabbix-agent2
 
 - name: Check and configure RAID MD Soft
   include_tasks:
     file: soft_raid_template.yaml
+  notify: Restart and enable zabbix-agent2
 
 - name: Check and configure nginx template
   include_tasks:
     file: nginx_template.yaml
+  notify: Restart and enable zabbix-agent2
 
 - name: Check and configure SMART template
   include_tasks:
     file: smart_template.yaml
+  notify: Restart and enable zabbix-agent2
 
 - name: Stop and disable zabbix-agent1
   ansible.builtin.systemd:
@@ -85,9 +87,3 @@
     state: stopped
     enabled: false
   when: ansible_facts.services['zabbix-agent.service'] is defined
-
-- name: Start and enable zabbix-agent2
-  ansible.builtin.systemd:
-    name: zabbix-agent2
-    state: started
-    enabled: true

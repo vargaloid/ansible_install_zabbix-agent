@@ -5,6 +5,7 @@
     executable: bash
   register: __mdraid_avail
   failed_when: __mdraid_avail.rc >= 2
+  changed_when: False
 
 - name: Updating zabbix_agent2.conf
   blockinfile:
