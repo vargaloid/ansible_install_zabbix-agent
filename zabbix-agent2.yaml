@@ -3,8 +3,9 @@
   become: yes
 #  remote_user: USERNAME
   vars:
+    ansible_python_interpreter: /usr/bin/python3
     zbx_srv_ip: 192.168.0.2
-    mysql_user_for_zbx_agent: zabbixagent
+    mysql_user_for_zbx_agent:
     mysql_pass_for_zbx_agent: ''
   roles:
     - zabbix-agent2

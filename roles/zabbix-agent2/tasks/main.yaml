@@ -6,6 +6,9 @@
   ansible.builtin.debug:
     msg: "{{ ansible_os_family }}-{{ ansible_distribution }}{{ ansible_distribution_version }}-{{ ansible_distribution_release }}"
 
+- name: Populate service facts
+  ansible.builtin.service_facts:
+
 - name: Download and install zabbix repo
   ansible.builtin.apt:
     deb: https://repo.zabbix.com/zabbix/6.0/{{ ansible_distribution | lower }}/pool/main/z/zabbix-release/zabbix-release_6.0-4+{{ ansible_distribution | lower }}{{ ansible_distribution_version }}_all.deb
@@ -18,6 +21,20 @@
     - zabbix-agent2-plugin-*
     update_cache: yes
   when: ansible_os_family == "Debian"
+
+- name: Stop and disable zabbix-agent1
+  ansible.builtin.systemd:
+    name: zabbix-agent
+    state: stopped
+    enabled: false
+  when: ansible_facts.services['zabbix-agent.service'] is defined
+
+- name: Stop zabbix-agent2
+  ansible.builtin.systemd:
+    name: zabbix-agent2
+    state: stopped
+  when: ansible_facts.services['zabbix-agent2.service'] is defined
+  notify: Restart and enable zabbix-agent2
 
 - name: Check zabbix user, home dir and shell
   ansible.builtin.user:
@@ -58,9 +75,6 @@
     state: present
   notify: Restart and enable zabbix-agent2
 
-- name: Populate service facts
-  ansible.builtin.service_facts:
-
 - name: Check and setup mysql plugin
   include_tasks:
     file: mysql_plugin.yaml
@@ -76,10 +90,3 @@
 - name: Check and configure SMART template
   include_tasks:
     file: smart_template.yaml
-
-- name: Stop and disable zabbix-agent1
-  ansible.builtin.systemd:
-    name: zabbix-agent
-    state: stopped
-    enabled: false
-  when: ansible_facts.services['zabbix-agent.service'] is defined
